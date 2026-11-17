@@ -11,7 +11,7 @@ import {connectDB} from "./db.js";
 import {User,Food,Order} from "./models.js";
 
 const app=express();
-app.disable("x-powered-by");app.use(helmet());app.use(cors({origin:[process.env.CLIENT_URL||"http://localhost:5173","https://qbfrontend.onrender.com"], credentials:true, methods: ['GET', 'POST', 'PUT', 'DELETE'], credentials: true }));app.use(express.json({limit:"100kb"}));
+app.disable("x-powered-by");app.use(helmet());app.use(cors({origin:[process.env.CLIENT_URL||"http://localhost:5173","https://qbfrontend.onrender.com"], credentials:true }));app.use(express.json({limit:"100kb"}));
 app.use("/api",rateLimit({windowMs:60000,limit:180,standardHeaders:true,legacyHeaders:false}));
 const fail=(res,status,message)=>res.status(status).json({message});
 const distanceKm=(a,b)=>{const r=Math.PI/180,dLat=(b.latitude-a.latitude)*r,dLon=(b.longitude-a.longitude)*r,x=Math.sin(dLat/2)**2+Math.cos(a.latitude*r)*Math.cos(b.latitude*r)*Math.sin(dLon/2)**2;return 6371*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))};
@@ -94,4 +94,4 @@ app.delete("/api/orders/:id/location",auth,async(req,res)=>{if(!["admin","delive
 app.use((_req,res)=>fail(res,404,"Endpoint not found."));
 app.use((err,_req,res,_next)=>{console.error(err);if(err.code===11000)return fail(res,409,"Record already exists.");if(err.name==="ValidationError"||err.name==="CastError")return fail(res,400,err.message);fail(res,500,"Something went wrong.")});
 const port=process.env.PORT||5000;
-try{if(!process.env.JWT_SECRET||process.env.JWT_SECRET.length<24)throw new Error("Set JWT_SECRET to at least 24 characters in backend/.env");await connectDB();app.listen(port,"0.0.0.0",()=>console.log(`QuickBite API running at port ${port}`))}catch(e){console.error("Startup failed:",e.message);process.exit(1)}
+try{if(!process.env.JWT_SECRET||process.env.JWT_SECRET.length<24)throw new Error("Set JWT_SECRET to at least 24 characters in backend/.env");await connectDB();app.listen(port,"0.0.0.0",()=>console.log(`QuickBite API running at port ${port}`))} catch(e){console.error("Startup failed:",e.message);process.exit(1)}
